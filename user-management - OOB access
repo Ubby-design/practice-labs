@@ -1,0 +1,47 @@
+The focus here will be on Out-Of-Band (OOB) access.
+Basically OOB access is the art of controlling a server without using its normal network or OS.
+
+The objective here is to teach 'Infr Survivability'
+
+Normal way (In-Band);
+Laptop → SSH → Server OS → do work
+If SSH breaks, one is locked out of the server. This is called In-Band access because the same "band" (Path) is used , just like normal traffic.
+
+Out-Of-Band (OOB):
+Laptop → Console/Rescue/Serial → Direct machine control
+Notice here that ; SSH, firewall, network,sudo, services are all bypassed (....talk directly to the machine).
+Keyboard plugged into the server, that's OOB access because a seperate control path is used.
+Out-Of_band access types:
+ *Vm console (VirtualBox/VMware/Promax)
+ *Cloud serial console (AWS ec2 serial console/Azure serial console/GCP console)
+ *Rescue/Recovery Mode : OOB access allows repair of server when normal access (SSH/network/OS) is broken, and Resue/Recovery mode is linux's built-in environment for repair work(s).
+It allow direct machine control.
+
+Out-Of_band finds application in the following sceanrios;
+When SSH or OS is unusable.
+
+Common real world failures-
+
+*lost sudo
+*broken sudoers
+*SSH misconfig
+*firewall lock-out
+*wrong network config
+*disk full
+*bad fstab (won't boot)
+*permission chaos
+*kernel boot failure
+
+Out-of-Band access is an alternative management path that lets you control a server without relying on its normal OS or network. 
+Recovery mode is Linux’s minimal boot environment that provides a root shell for repairing issues like broken SSH, sudo, or boot failures.
+
+Every serious linux otage follows ; Boot - Root - Repair
+
+
+
+
+
+
+
+
+
