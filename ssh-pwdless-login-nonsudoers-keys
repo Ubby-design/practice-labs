@@ -1,0 +1,228 @@
+sudo mkdir -p ~/.ssh
+sudo touch ~/.ssh/authorized_keys
+sudo chmod 700 ~/.ssh
+sudo chmod 600 ~/.ssh/authorized_keys
+sudo chown -R vagrant:vagrant ~/.ssh
+
+#####
+
+echo "your-public-key-here" | sudo tee -a ~/.ssh/authorized_keys
+COPY BACKEND1 PUB KEY TO BACKUP FILE; 
+
+grep 'backend1@zerosix' ~/.ssh/authorized_keys >> ~/.ssh/authorized_keys.bak
+
+vagrant@fsie-node1:~$ cat ~/.ssh/authorized_keys.bak
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILYNiLTy/dai+D7JHsepS/mqcGgYb5/jS84N+Yxl/j7U vagrant
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfivuVRWuJJHXK62NPOiKBPnVdVc351SPWT6qAAJw6F fsie-lab-key
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYj1LhtGU+YoayTWJuJk1MZP0Be7ZrHavtA1P60JVla backend1@zerosix
+ssh -i ~/.ssh/backend1_ed25519 vagrant@192.168.56.71
+
+################
+
+Excellent 👏 — nice work.
+Here’s a clean, professional rundown of how we achieved backend1 passwordless SSH login.
+
+🎯 Objective
+
+Allow backend1 (a human login user):
+
+✅ To SSH into the server
+
+✅ Without a password
+
+✅ Without sudo
+
+✅ Without using su
+
+✅ With proper Linux security
+
+🔐 Step-by-Step Breakdown of What We Did
+1️⃣ Generated an Ed25519 Key Pair (Client Side)
+
+On your Git Bash (workstation), you created:
+
+backend1_ed25519        → private key (stays on your machine)
+backend1_ed25519.pub    → public key (goes to server)
+
+
+Why Ed25519?
+
+Modern
+
+Smaller
+
+Faster
+
+More secure than RSA
+
+Recommended by OpenSSH
+
+2️⃣ Placed the Public Key in the Correct User’s Home
+
+This was the critical fix.
+
+SSH works per-user.
+
+When you run:
+
+ssh backend1@192.168.56.71
+
+
+SSH checks:
+
+/home/backend1/.ssh/authorized_keys
+
+
+Originally, the key was inside:
+
+/home/vagrant/.ssh/
+
+
+Which is why login failed.
+
+We corrected it by:
+
+sudo mkdir -p /home/backend1/.ssh
+sudo nano /home/backend1/.ssh/authorized_keys
+
+
+Then pasting backend1’s public key there.
+
+3️⃣ Set Proper Ownership and Permissions (Very Important)
+
+SSH is strict about permissions.
+
+We set:
+
+sudo chown -R backend1:backend1 /home/backend1/.ssh
+sudo chmod 700 /home/backend1/.ssh
+sudo chmod 600 /home/backend1/.ssh/authorized_keys
+
+
+Why?
+
+SSH refuses login if:
+
+.ssh is writable by others
+
+authorized_keys has loose permissions
+
+files are owned by the wrong user
+
+This step made SSH trust the key.
+
+4️⃣ Ensured Home Directory Was Correct for a Human User
+
+Because backend1 is a human login user:
+
+/home/backend1 → owned by backend1
+
+
+This allows:
+
+Writing files
+
+Creating configs
+
+Normal shell usage
+
+We avoided making it root-owned (which would break usability).
+
+5️⃣ Restarted SSH Service
+sudo systemctl restart ssh
+
+
+This ensured:
+
+Updated sshd_config was active
+
+Public key authentication was enabled
+
+6️⃣ Logged In Using the Private Key
+
+From Git Bash:
+
+####      ssh -i ~/.ssh/backend1_ed25519 backend1@192.168.56.71        ######
+
+
+Here’s what happens behind the scenes:
+
+Client says: “I am backend1.”
+
+Server checks /home/backend1/.ssh/authorized_keys
+
+Server finds matching public key
+
+Server challenges client
+
+Client signs with private key
+
+Server verifies signature
+
+Login granted
+
+No password transmitted.
+
+🧠 Security Model We Built
+
+✔ Each backend user logs in directly
+✔ No user switching with su
+✔ No shared passwords
+✔ No sudo access
+✔ SSH key-based authentication
+✔ Proper file ownership enforcement
+
+This is how enterprise Linux teams are structured.
+
+📂 Bonus: Shared App Directory
+
+We also configured:
+
+/apps/backend → root:backend (2775)
+
+
+With setgid bit enabled so:
+
+All backend users can collaborate
+
+Files inherit backend group
+
+Clean group-based access control
+
+🏁 Final Architecture
+
+Workstation
+⬇ (private key)
+SSH
+⬇
+Server verifies public key
+⬇
+User lands in their own secure home
+⬇
+Collaborates via group-controlled /apps/backend
+
+You’ve basically implemented:
+
+Multi-user Linux permissions
+
+SSH key authentication
+
+Group-based collaboration
+
+PAM restriction logic
+
+Enterprise-style access control
+
+Very solid lab work 👌
+
+If you’d like, next we can:
+
+Harden SSH further
+
+Restrict login times
+
+Force users into /apps/backend
+
+Or simulate a real DevOps workflow
+
+What would you like to build next?
