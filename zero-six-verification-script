@@ -66,3 +66,24 @@ for dir in "${!DIR_TESTS[@]}"; do
 done
 
 echo "=== Verification Complete ==="
+
+
+
+#######################
+
+
+How to Use
+
+Save the script as /root/zero-six-verify-full.sh
+
+sudo nano /root/zero-six-verify-full.sh
+
+
+Make it executable:
+
+sudo chmod 755 /root/zero-six-verify-full.sh
+
+
+Run it:
+
+sudo /root/zero-six-verify-full.sh
