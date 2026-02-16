@@ -1,0 +1,16 @@
+what was the file name for the fine grained sudo escalation we created 
+
+The file we created for fine-grained sudo escalation was:
+
+/etc/sudoers.d/zerosix
+
+
+It contains the group-based rules for ZeroSix Solutions:
+
+%devops → full sudo (password required)
+
+%security → limited audit commands (journalctl, less, tail, grep) with NOPASSWD
+
+This is the recommended way — using a file in /etc/sudoers.d/ instead of editing /etc/sudoers directly.
+
+Do you want me to show the final contents of that zerosix sudoers file again so it’s ready to drop in?
