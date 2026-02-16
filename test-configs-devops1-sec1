@@ -1,0 +1,101 @@
+Perfect! ✅ Now let’s test that your sudoers configuration and directory permissions are working correctly. We’ll do this step by step.
+
+1️⃣ Confirm group memberships
+groups devops1
+groups sec1
+groups backend1
+
+
+devops1 should be in: devops sudo (or whatever you set)
+
+sec1 should be in: security
+
+Backend/frontend users in their respective groups
+
+2️⃣ Check sudo privileges
+As DevOps user
+su - devops1
+sudo whoami
+
+
+✅ Expected: root (will prompt for password since no NOPASSWD)
+
+sudo ls /root
+
+
+✅ Expected: allowed
+
+sudo cp /etc/hosts /tmp/
+
+
+✅ Expected: allowed
+
+As Security user
+su - sec1
+sudo journalctl -xe
+
+
+✅ Expected: works, no password prompt
+
+sudo less /var/log/syslog
+sudo tail /var/log/auth.log
+sudo grep "error" /var/log/syslog
+
+
+✅ Expected: all work, no password prompt
+
+sudo ls /etc
+
+
+❌ Expected: denied, because not allowed in sudoers
+
+3️⃣ Check directory permissions
+ls -ld /apps/backend /apps/frontend /staging /finance/reports
+
+
+✅ Expected output similar to:
+
+drwxrwx---  root backend   /apps/backend
+drwxrwx---  root frontend  /apps/frontend
+drwxrwx---  root devops     /staging
+drwxrwx---  root finance   /finance/reports
+
+
+drwxrwx--- → owner + group can read/write/execute, others no access
+
+Setgid bit (chmod 2770) ensures new files inherit group
+
+4️⃣ Test group write access
+# As backend1
+su - backend1
+touch /apps/backend/testfile
+
+
+✅ Expected: allowed
+
+# As frontend1
+touch /apps/backend/testfile
+
+
+❌ Expected: denied, only group members can write
+
+5️⃣ Optional: Test NOPASSWD
+# As sec1
+sudo journalctl -xe
+
+
+Should not prompt for a password
+
+Verify log entries appear
+
+⚡ Summary
+
+These commands confirm:
+
+Users are in the correct groups
+
+Sudo rules work exactly as defined
+
+Directory ownership & permissions are enforced
+
+NOPASSWD works for Security, password required for DevOps
