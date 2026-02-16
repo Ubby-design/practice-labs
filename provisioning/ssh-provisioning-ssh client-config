@@ -1,0 +1,122 @@
+Good 👍 — here is a clean, production-style one-block setup you can copy-paste.
+
+This will:
+
+Create the user (if not existing)
+
+Ensure home directory is correct
+
+Fix ownership
+
+Create .ssh
+
+Set proper permissions
+
+Prepare authorized_keys
+
+✅ One-Block Setup for fsie-node1
+# Create user if not exists
+sudo id fsie-node1 &>/dev/null || sudo useradd -m -s /bin/bash fsie-node1
+
+# Ensure correct home ownership
+sudo chown -R fsie-node1:fsie-node1 /home/fsie-node1
+
+# Fix home permissions
+sudo chmod 700 /home/fsie-node1
+
+# Create .ssh directory safely
+sudo mkdir -p /home/fsie-node1/.ssh
+
+# Set correct permissions
+sudo chmod 700 /home/fsie-node1/.ssh
+
+# Create authorized_keys file if not exists
+sudo touch /home/fsie-node1/.ssh/authorized_keys
+
+# Set correct permissions on key file
+sudo chmod 600 /home/fsie-node1/.ssh/authorized_keys
+
+# Final ownership correction
+sudo chown -R fsie-node1:fsie-node1 /home/fsie-node1/.ssh
+
+echo "User and SSH setup complete."
+
+🔑 Now Add Public Key
+
+If you want to automatically copy your current user’s public key into fsie-node1:
+
+sudo bash -c "cat ~/.ssh/id_rsa.pub >> /home/fsie-node1/.ssh/authorized_keys"
+
+
+(Only works if you already have a key in ~/.ssh/id_rsa.pub.)
+
+🧪 Test Login
+ssh fsie-node1@fsie-node1
+
+
+or from another node:
+
+ssh fsie-node1@<IP-address>
+
+🔒 Why This Works
+
+SSH requires:
+
+Item	Required Permission
+/home/user	700
+.ssh	700
+authorized_keys	600
+Ownership	Must belong to the user
+
+
+#####  
+
+Generate key pair:
+
+$ ssh-keygen -t ed25519 -C "backend2@zerosix" -f ~/.ssh/backend2_ed25519
+
+####
+
+copy pub key:
+
+cat ~/.ssh/backend2_ed25519
+$ cat ~/.ssh/backend2_ed25519.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOBnJs7xiU23wUpOv88gwCSe+POufZRCRw+klov1cJi3 backend2@zerosix
+
+ssh in to vm:
+
+sudo nano /home/backend2/.ssh/authorized_keys
+
+Paste the pub-key 
+Save and exit
+
+exit vm
+
+#### SSH client configuration (via ~/.ssh/config):
+
+Step 1:
+nano ~/.ssh/config
+
+Step 2:  Add Host Configuration
+PASTE: 
+Host backend2
+    HostName 192.168.56.71
+    User backend2
+    IdentityFile ~/.ssh/backend2_ed25519
+    IdentitiesOnly yes
+
+Save & exit
+
+Step 3: Fix Permissions
+chmod 600 ~/.ssh/config
+chmod 600 ~/.ssh/backend2_ed25519
+chmod 700 ~/.ssh
+
+Step 4: Simply login
+
+ssh backend2 
+
+
+PROVISIONING TEMPLATE IS READY (edit the necessary variables)
+
+If any of these are wrong, SSH silently refuses login.
