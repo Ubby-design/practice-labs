@@ -1,0 +1,68 @@
+#!/bin/bash
+# ==============================================
+# ZeroSix Solutions RBAC & Sudo Full Verification Script
+# Checks: users, groups, sudo, NOPASSWD, directory permissions, and file operations
+# ==============================================
+
+echo "=== 1️⃣ Group Memberships ==="
+for user in devops1 devops2 sec1 backend1 backend2 frontend1 qa1 finance1; do
+    echo "$user groups: $(groups $user)"
+done
+echo ""
+
+echo "=== 2️⃣ Directory Permissions ==="
+for dir in /apps/backend /apps/frontend /staging /finance/reports /shared/infra; do
+    ls -ld $dir
+done
+echo ""
+
+echo "=== 3️⃣ Sudo Tests ==="
+
+# DevOps test
+echo "--- DevOps sudo test ---"
+su - devops1 -c "echo 'DevOps sudo whoami:'; sudo whoami"
+su - devops1 -c "sudo ls /root > /dev/null && echo 'DevOps can access /root' || echo 'DevOps cannot access /root'"
+echo ""
+
+# Security test
+echo "--- Security sudo test ---"
+su - sec1 -c "echo 'Security sudo journalctl:'; sudo journalctl -xe -n 5"
+su - sec1 -c "sudo less /var/log/syslog > /dev/null && echo 'Security can read syslog' || echo 'Security cannot read syslog'"
+su - sec1 -c "sudo tail /var/log/auth.log > /dev/null && echo 'Security can tail auth.log' || echo 'Security cannot tail auth.log'"
+su - sec1 -c "sudo grep 'error' /var/log/syslog > /dev/null && echo 'Security can grep syslog' || echo 'Security cannot grep syslog'"
+su - sec1 -c "sudo ls /etc > /dev/null && echo 'Security can access /etc (should fail)' || echo 'Security cannot access /etc (expected)'"
+echo ""
+
+echo "=== 4️⃣ Directory File Operations ==="
+
+declare -A DIR_TESTS=(
+    ["/apps/backend"]="backend1 backend2"
+    ["/apps/frontend"]="frontend1"
+    ["/staging"]="devops1 devops2"
+    ["/finance/reports"]="finance1"
+    ["/shared/infra"]="devops1"
+)
+
+for dir in "${!DIR_TESTS[@]}"; do
+    echo "--- Testing $dir ---"
+    for user in ${DIR_TESTS[$dir]}; do
+        su - $user -c "touch $dir/testfile_$user 2>/dev/null && echo '$user can write in $dir' || echo '$user CANNOT write in $dir'"
+        su - $user -c "ls $dir/testfile_$user 2>/dev/null && echo '$user can read $dir/testfile_$user' || echo '$user CANNOT read $dir/testfile_$user'"
+    done
+    echo ""
+done
+
+echo "=== 5️⃣ NOPASSWD Verification ==="
+echo "Security sudo should NOT ask for password:"
+su - sec1 -c "sudo journalctl -n 3 > /dev/null && echo 'NOPASSWD working for sec1'"
+
+echo "DevOps sudo SHOULD ask for password:"
+su - devops1 -c "sudo ls /root > /dev/null && echo 'DevOps sudo requires password (check prompt)'"
+
+echo ""
+echo "=== 6️⃣ Cleanup Test Files ==="
+for dir in "${!DIR_TESTS[@]}"; do
+    rm -f $dir/testfile_*
+done
+
+echo "=== Verification Complete ==="
