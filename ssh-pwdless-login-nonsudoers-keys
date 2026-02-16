@@ -226,3 +226,14 @@ Force users into /apps/backend
 Or simulate a real DevOps workflow
 
 What would you like to build next?
+
+
+#############
+
+Host backend1
+    HostName 192.168.56.71
+    User backend1
+    IdentityFile ~/.ssh/backend1_ed25519
+ADD THE ABOVE CONFIG TO ~/.ssh/config on Git Bash:    login as : ssh backend1
+
+sudo ls -ld /home/backend1 (command to check if backend1 has a home directory)
