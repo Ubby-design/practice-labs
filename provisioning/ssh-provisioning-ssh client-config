@@ -1,7 +1,9 @@
 Good 👍 — here is a clean, production-style one-block setup you can copy-paste.
 
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOZsGyObdT/UsP8DOv41gi8Uk1/xUjatKOcuKNvaP8W finance1@zerosix
+LOGIN; ssh -i ~/.ssh/devops1_ed25519 devops1@192.168.56.71
 
+ssh-keygen -t ed25519 -C "backend1@zerosix" -f ~/.ssh/backend1_ed25519
 
 This will:
 
@@ -92,7 +94,10 @@ sudo nano /home/backend2/.ssh/authorized_keys
 
 Paste the pub-key 
 Save and exit
+### Reinforce permissions for the two directories and the auth file
+### configure local DNS : echo "192.168.56.71 frontend1" | sudo tee -a /etc/hosts
 
+##################### sudo systemctl enable ssh
 exit vm
 
 #### SSH client configuration (via ~/.ssh/config):
