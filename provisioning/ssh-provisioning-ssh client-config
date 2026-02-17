@@ -1,5 +1,8 @@
 Good 👍 — here is a clean, production-style one-block setup you can copy-paste.
 
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOOZsGyObdT/UsP8DOv41gi8Uk1/xUjatKOcuKNvaP8W finance1@zerosix
+
+
 This will:
 
 Create the user (if not existing)
