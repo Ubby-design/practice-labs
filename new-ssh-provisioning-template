@@ -1,0 +1,46 @@
+If you want, I can also make a 1-line “SSH-ready setup” for any new user so this doesn’t happen again. Do you want me to do that?
+
+yes
+
+Perfect — here’s a 1-shot SSH-ready setup for any new Linux user so keys work reliably from the start:
+
+SSH Setup Template for a New User
+# Replace <username> with the actual user
+# Replace <public_key_file> with your local public key path
+
+# 1️⃣ Ensure user exists
+sudo id <username> &>/dev/null || sudo adduser <username>
+
+# 2️⃣ Ensure home directory exists
+sudo mkdir -p /home/<username>
+sudo chown <username>:<username> /home/<username>
+sudo chmod 700 /home/<username>
+
+# 3️⃣ Ensure .ssh directory exists
+sudo mkdir -p /home/<username>/.ssh
+sudo chown <username>:<username> /home/<username>/.ssh
+sudo chmod 700 /home/<username>/.ssh
+
+# 4️⃣ Add your public key to authorized_keys
+sudo sh -c "cat <public_key_file> >> /home/<username>/.ssh/authorized_keys"
+
+# 5️⃣ Fix ownership & permissions
+sudo chown <username>:<username> /home/<username>/.ssh/authorized_keys
+sudo chmod 600 /home/<username>/.ssh/authorized_keys
+
+# 6️⃣ Convert line endings to Unix format (important if created on Windows)
+sudo dos2unix /home/<username>/.ssh/authorized_keys
+
+✅ Notes / Best Practices
+
+.ssh → 700, authorized_keys → 600, owned by the user.
+
+Convert line endings if keys are created on Windows (dos2unix).
+
+Append keys (>>) instead of overwriting (>), to avoid losing existing keys.
+
+Ensure the user’s home folder is not world-writable.
+
+This is essentially a plug-and-play sequence for any Linux user, and it will make public-key authentication work on first attempt.
+
+If you want, I can also make a ready-to-use Git Bash SSH config snippet so you can log in with just ssh <user> without specifying -i. Do you want me to do that too?
